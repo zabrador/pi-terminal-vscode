@@ -8,8 +8,12 @@ export function activate(context: vscode.ExtensionContext): void {
   context.subscriptions.push(vscode.window.registerWebviewViewProvider('piTerminal.pi', {
     resolveWebviewView(view) {
       let terminal: pty.IPty | undefined;
-      let started = false;
-      const disposables: vscode.Disposable[] = [];
+      const processDisposables: vscode.Disposable[] = [];
+      const stop = () => {
+        for (const disposable of processDisposables.splice(0)) {disposable.dispose();}
+        terminal?.kill();
+        terminal = undefined;
+      };
       const root = context.extensionUri;
       const resource = (name: string) => view.webview.asWebviewUri(vscode.Uri.joinPath(root, ...name.split('/')));
       const nonce = randomBytes(24).toString('base64');
@@ -31,11 +35,15 @@ export function activate(context: vscode.ExtensionContext): void {
   <script nonce="${nonce}" src="${resource('media/webview.js')}"></script>
 </body>
 </html>`;
+      const restart = vscode.commands.registerCommand('piTerminal.restart', () => {
+        stop();
+        void view.webview.postMessage({ type: 'reset' });
+      });
       const write = (data: string) => { void view.webview.postMessage({ type: 'output', data }); };
-      disposables.push(view.webview.onDidReceiveMessage(message => {
+      const messages = view.webview.onDidReceiveMessage(message => {
         if (!message || typeof message !== 'object') {return;}
-        if (message.type === 'ready' && !started) {
-          started = true;
+        if (message.type === 'ready' && !terminal) {
+          stop();
           const active = vscode.window.activeTextEditor?.document.uri;
           const folder = (active && vscode.workspace.getWorkspaceFolder(active)) || vscode.workspace.workspaceFolders?.[0];
           try {
@@ -47,9 +55,9 @@ export function activate(context: vscode.ExtensionContext): void {
               cwd: folder?.uri.fsPath || homedir(),
               env: { ...process.env, TERM: 'xterm-256color', COLORTERM: 'truecolor' }
             });
-            disposables.push(terminal.onData(write), terminal.onExit(({ exitCode }) => {
+            processDisposables.push(terminal.onData(write), terminal.onExit(({ exitCode }) => {
               terminal = undefined;
-              write(`\r\nPi exited (${exitCode}).\r\n`);
+              write(`\r\nPi exited (${exitCode}). Use Restart Pi to start again.\r\n`);
             }));
           } catch (error) { write(`\r\nCould not start Pi: ${String(error)}\r\n`); }
         } else if (message.type === 'input' && typeof message.data === 'string') {
@@ -57,11 +65,11 @@ export function activate(context: vscode.ExtensionContext): void {
         } else if (message.type === 'resize' && Number.isInteger(message.cols) && Number.isInteger(message.rows) && message.cols >= 2 && message.cols <= 1000 && message.rows >= 1 && message.rows <= 1000) {
           terminal?.resize(message.cols, message.rows);
         }
-      }));
+      });
       const cleanup = new vscode.Disposable(() => {
-        for (const disposable of disposables) {disposable.dispose();}
-        terminal?.kill();
-        terminal = undefined;
+        messages.dispose();
+        restart.dispose();
+        stop();
       });
       view.onDidDispose(() => cleanup.dispose());
       context.subscriptions.push(cleanup);

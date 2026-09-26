@@ -4,7 +4,7 @@ Run Pi in a single interactive VS Code pane. It opens in the Secondary Side Bar 
 
 Intended for desktop VS Code on macOS, Linux, and Windows. Requires VS Code 1.138 or later, a trusted workspace, and Pi installed separately. On macOS and Linux, `pi` must be available in your login shell; on Windows, it must be available on PATH to `cmd.exe`.
 
-Open **Pi Terminal** to start Pi in the active editor's workspace folder, the first workspace folder, or your home directory. Hiding the pane keeps Pi running. Reloading the window starts a fresh process; sessions are not restored.
+Open **Pi Terminal** to start Pi in the active editor's workspace folder, the first workspace folder, or your home directory. Hiding the pane keeps Pi running. Use **Restart Pi** to stop the current process, clear the terminal, and start Pi again, including after it exits. Sessions are not restored.
 
 ## Development
 

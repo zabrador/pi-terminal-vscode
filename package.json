@@ -2,7 +2,7 @@
   "name": "pi-terminal",
   "displayName": "Pi Terminal",
   "description": "An interactive Pi terminal, shown in the Secondary Side Bar by default",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "engines": {
     "vscode": "^1.138.0"
   },
@@ -27,6 +27,28 @@
           "id": "piTerminal.pi",
           "name": "Pi Terminal",
           "type": "webview"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "piTerminal.restart",
+        "title": "Restart Pi",
+        "icon": "$(refresh)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "piTerminal.restart",
+          "when": "view == piTerminal.pi",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "piTerminal.restart",
+          "when": "false"
         }
       ]
     }
