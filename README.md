@@ -2,7 +2,7 @@
 
 Run Pi in a single interactive VS Code pane. It opens in the Secondary Side Bar by default and can be moved like any other view.
 
-Requires macOS, VS Code 1.138 or later, and Pi installed separately with `pi` available in your login shell. The workspace must be trusted.
+Intended for desktop VS Code on macOS, Linux, and Windows. Requires VS Code 1.138 or later, a trusted workspace, and Pi installed separately. On macOS and Linux, `pi` must be available in your login shell; on Windows, it must be available on PATH to `cmd.exe`.
 
 Open **Pi Terminal** to start Pi in the active editor's workspace folder, the first workspace folder, or your home directory. Hiding the pane keeps Pi running. Reloading the window starts a fresh process; sessions are not restored.
 
@@ -19,3 +19,5 @@ Set breakpoints in `src/extension.ts`. After editing code or webview assets, rel
 - `npm run package` produces a production build in `dist/`; it does not create a VSIX.
 
 The extension connects `node-pty` to xterm in the webview. The build keeps the native dependency external and ensures its spawn helper is executable. The webview loads xterm's browser bundles directly, with no separate frontend build.
+
+When distributing a VSIX, build on the target operating system and architecture and package with the matching `vsce --target` value. The bundled node-pty binaries must match the extension host; a package built on macOS is not a universal package.

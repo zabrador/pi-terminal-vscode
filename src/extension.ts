@@ -39,7 +39,10 @@ export function activate(context: vscode.ExtensionContext): void {
           const active = vscode.window.activeTextEditor?.document.uri;
           const folder = (active && vscode.workspace.getWorkspaceFolder(active)) || vscode.workspace.workspaceFolders?.[0];
           try {
-            terminal = pty.spawn(process.env.SHELL || '/bin/zsh', ['-lic', 'exec pi'], {
+            const windows = process.platform === 'win32';
+            const shell = windows ? process.env.ComSpec || 'cmd.exe' : process.env.SHELL || '/bin/sh';
+            const args = windows ? ['/d', '/s', '/c', 'pi'] : ['-lic', 'exec pi'];
+            terminal = pty.spawn(shell, args, {
               name: 'xterm-256color', cols: 80, rows: 24,
               cwd: folder?.uri.fsPath || homedir(),
               env: { ...process.env, TERM: 'xterm-256color', COLORTERM: 'truecolor' }
