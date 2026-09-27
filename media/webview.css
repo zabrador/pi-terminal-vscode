@@ -1,1 +1,1 @@
-html, body, #terminal { height: 100%; margin: 0; overflow: hidden; background: #000; }
+html, body, #terminal { height: 100%; margin: 0; overflow: hidden; background: var(--vscode-terminal-background, var(--vscode-panel-background)); }

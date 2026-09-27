@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1
+
+- Use VS Code terminal theme colors when opening the pane or clicking Restart Pi.
+- Share the same terminal reset sequence between startup and restart.
+
 ## 0.2.0
 
 - Add a Restart Pi button to start a fresh process without reloading VS Code.
