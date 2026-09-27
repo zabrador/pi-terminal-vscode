@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.0
+
+- Route Plannotator reviews from the Pi pane into VS Code on macOS/Linux when the Plannotator extensions are installed and browser routing is enabled.
+- Keep the existing launch environment when routing configuration is unavailable or invalid.
+
 ## 0.2.1
 
 - Use VS Code terminal theme colors when opening the pane or clicking Restart Pi.

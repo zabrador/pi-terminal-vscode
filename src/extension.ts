@@ -2,9 +2,13 @@ import * as vscode from 'vscode';
 import * as pty from 'node-pty';
 import { randomBytes } from 'node:crypto';
 import { homedir } from 'node:os';
+import { plannotatorEnvironment } from './plannotator';
 
 /** Registers the Pi view; its process starts when the view opens and stops when disposed. */
-export function activate(context: vscode.ExtensionContext): void {
+export async function activate(context: vscode.ExtensionContext): Promise<void> {
+  if (process.platform !== 'win32') {
+    await Promise.resolve(vscode.extensions.getExtension('backnotprop.plannotator-webview')?.activate()).catch(() => undefined);
+  }
   context.subscriptions.push(vscode.window.registerWebviewViewProvider('piTerminal.pi', {
     resolveWebviewView(view) {
       let terminal: pty.IPty | undefined;
@@ -53,7 +57,7 @@ export function activate(context: vscode.ExtensionContext): void {
             terminal = pty.spawn(shell, args, {
               name: 'xterm-256color', cols: 80, rows: 24,
               cwd: folder?.uri.fsPath || homedir(),
-              env: { ...process.env, TERM: 'xterm-256color', COLORTERM: 'truecolor' }
+              env: { ...process.env, ...plannotatorEnvironment(), TERM: 'xterm-256color', COLORTERM: 'truecolor' }
             });
             processDisposables.push(terminal.onData(write), terminal.onExit(({ exitCode }) => {
               terminal = undefined;
